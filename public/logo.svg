@@ -1,0 +1,19 @@
+<svg width="240" height="240" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="MindLens emblem">
+  <defs>
+    <linearGradient id="mlGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3B82F6"/>
+      <stop offset="100%" stop-color="#22D3EE"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Outer circle -->
+  <circle cx="120" cy="120" r="110" fill="url(#mlGrad)"/>
+  <circle cx="120" cy="120" r="88" fill="#fff"/>
+
+  <!-- Notebook-style rounded square with M -->
+  <rect x="80" y="80" width="80" height="80" rx="16" ry="16" fill="none" stroke="url(#mlGrad)" stroke-width="12"/>
+  <path d="M100 144v-32c0-3 3-5 6-3l14 12 14-12c3-2 6 0 6 3v32c0 3-3 6-6 6h-28c-3 0-6-3-6-6z" fill="url(#mlGrad)"/>
+
+  <!-- Spark/star at top-right -->
+  <path d="M168 72l6-12 6 12 12 6-12 6-6 12-6-12-12-6 12-6z" fill="url(#mlGrad)"/>
+</svg>
