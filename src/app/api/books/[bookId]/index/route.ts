@@ -86,10 +86,6 @@ export async function POST(
       );
     }
 
-    console.log(
-      `Processing ${sourceType} source for user ${decoded.userId}, book ${bookId}, attachment ${attachmentId}...`
-    );
-
     let docs: Document[] = [];
     const embeddings = new OpenAIEmbeddings({
       model: "text-embedding-3-small",
@@ -103,10 +99,8 @@ export async function POST(
             { status: 400 }
           );
         }
-        console.log(`Loading PDF from: ${filePath}`);
         const pdfLoader = new PDFLoader(filePath);
         docs = await pdfLoader.load();
-        console.log(`Loaded ${docs.length} pages from PDF`);
         break;
 
       case "website":
@@ -116,13 +110,10 @@ export async function POST(
             { status: 400 }
           );
         }
-        console.log(`Loading website from: ${sourceUrl}`);
 
         const compiledConvert = compile({ wordwrap: 130 });
 
         if (sourceUrl.includes("https://github.com")) {
-          console.log("Loading github repo...");
-
           const githubLoader = new GithubRepoLoader(sourceUrl, {
             branch: "main",
             recursive: false,
@@ -141,8 +132,6 @@ export async function POST(
           docs = await urlLoader.load();
         }
 
-        console.log(`Loaded ${docs.length} pages from website`);
-
         // Create text splitter for website content
         const textSplitter = new RecursiveCharacterTextSplitter({
           chunkSize: 1000,
@@ -150,9 +139,7 @@ export async function POST(
           separators: ["\n\n", "\n", " ", ""],
         });
 
-        console.log("Splitting website content into chunks...");
         docs = await textSplitter.splitDocuments(docs);
-        console.log(`Created ${docs.length} chunks from website content`);
         break;
 
       case "youtube":
@@ -162,7 +149,6 @@ export async function POST(
             { status: 400 }
           );
         }
-        console.log(`Loading YouTube video from: ${sourceUrl}`);
 
         try {
           const ytLoader = YoutubeLoader.createFromUrl(sourceUrl, {
@@ -171,9 +157,6 @@ export async function POST(
           });
 
           docs = await ytLoader.load();
-          console.log(
-            `Loaded transcript from YouTube video (${docs.length} documents)`
-          );
 
           if (docs.length > 0) {
             const ytTextSplitter = new RecursiveCharacterTextSplitter({
@@ -181,12 +164,7 @@ export async function POST(
               chunkOverlap: 200,
               separators: ["\n\n", "\n", ". ", " ", ""],
             });
-
-            console.log("Splitting YouTube transcript into chunks...");
             docs = await ytTextSplitter.splitDocuments(docs);
-            console.log(
-              `Created ${docs.length} chunks from YouTube transcript`
-            );
           }
         } catch (error) {
           console.error("YouTube processing error:", error);
@@ -240,8 +218,6 @@ export async function POST(
         }
       });
 
-    console.log("Creating embeddings and storing in vector database...");
-
     // Use a collection name that includes user context for better isolation
     const collectionName = `mindlens-${decoded.userId}`;
 
@@ -264,10 +240,6 @@ export async function POST(
         .substring(0, 1000), // Store first 1000 chars as preview
       processingCompletedAt: new Date(),
     });
-
-    console.log(
-      `Successfully indexed ${docs.length} documents/chunks for user ${decoded.userId}, book ${bookId}`
-    );
 
     return NextResponse.json({
       status: "Indexing Done",

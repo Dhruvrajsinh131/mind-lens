@@ -76,8 +76,6 @@ export async function POST(
 
     const collectionName = `mindlens-${decoded.userId}`;
 
-    console.log("decoded.userId", decoded.userId);
-
     let vectorStore;
     try {
       vectorStore = await QdrantVectorStore.fromExistingCollection(embeddings, {
@@ -96,9 +94,6 @@ export async function POST(
       );
     }
 
-    console.log("decoded.userId", decoded.userId);
-    console.log("bookId", bookId);
-
     const retriever = vectorStore.asRetriever({
       k: 6,
       filter: {
@@ -109,27 +104,7 @@ export async function POST(
       },
     });
 
-    console.log(
-      `Querying ${includeAllBooks ? "all books" : "specific book"} for user ${
-        decoded.userId
-      }`
-    );
-    console.log(`Query: "${userQuery}"`);
-
     const relevantChunks = await retriever.invoke(userQuery);
-
-    console.log(`Found ${relevantChunks.length} relevant chunks`);
-    if (relevantChunks.length > 0) {
-      console.log(
-        "Chunk sources:",
-        relevantChunks.map((chunk) => ({
-          source: chunk.metadata?.source || "Unknown source",
-          bookTitle: chunk.metadata?.bookTitle || "Unknown book",
-          attachmentName:
-            chunk.metadata?.attachmentName || "Unknown attachment",
-        }))
-      );
-    }
 
     if (relevantChunks.length === 0) {
       const encoder = new TextEncoder();

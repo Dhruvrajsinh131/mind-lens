@@ -123,8 +123,6 @@ export async function POST(
       metadata,
     } = body;
 
-    console.log("body", body);
-
     if (!mongoose.Types.ObjectId.isValid(bookId)) {
       return NextResponse.json({ error: "Invalid book ID" }, { status: 400 });
     }

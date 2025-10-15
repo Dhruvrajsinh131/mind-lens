@@ -6,9 +6,6 @@ import { verifyToken } from "@/lib/auth";
 export async function GET(request: NextRequest) {
   try {
     const token = request.cookies.get("auth-token")?.value;
-
-    console.log("token", token);
-
     if (!token) {
       return NextResponse.json(
         { error: "No authentication token provided" },

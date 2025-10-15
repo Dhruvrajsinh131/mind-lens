@@ -31,14 +31,10 @@ export async function GET(request: NextRequest) {
 
     await connectDB();
 
-    console.log("decoded.userId", decoded.userId);
-
     const books = await Book.find({ userId: decoded.userId })
       .populate("attachmentCount")
       .sort({ updatedAt: -1 })
       .lean();
-
-    console.log("books", books);
 
     return NextResponse.json(
       {

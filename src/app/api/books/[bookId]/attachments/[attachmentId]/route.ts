@@ -274,10 +274,6 @@ export async function DELETE(
         collectionName: collectionName,
         apiKey: process.env.QDRANT_API_KEY,
       });
-
-      console.log(
-        `TODO: Delete vectors for attachment ${attachmentId} from collection ${collectionName}`
-      );
     } catch (vectorError) {
       console.error("Error removing from vector database:", vectorError);
     }
