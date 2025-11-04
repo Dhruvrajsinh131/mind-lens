@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile } from "fs/promises";
-import path from "path";
-import { existsSync, mkdirSync } from "fs";
+import storageClient from "@/client/supabaseClient";
 
 export async function POST(req: NextRequest) {
   try {
@@ -38,25 +36,14 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-
-    // Create uploads directory if it doesn't exist
-    const uploadsDir = path.join(process.cwd(), "uploads");
-    if (!existsSync(uploadsDir)) {
-      mkdirSync(uploadsDir, { recursive: true });
-    }
-
     // Generate unique filename to avoid conflicts
     const timestamp = Date.now();
     const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
     const fileName = `${timestamp}_${sanitizedFileName}`;
-    const filePath = path.join(uploadsDir, fileName);
-
-    // Convert file to buffer and save
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-
-    await writeFile(filePath, buffer);
-
+    const resp = await storageClient
+      .from("mind-lens-test")
+      .upload(`upload/${fileName}`, file);
+    const filePath = resp.data?.path;
     // Return the file path for use in indexing
     return NextResponse.json({
       success: true,

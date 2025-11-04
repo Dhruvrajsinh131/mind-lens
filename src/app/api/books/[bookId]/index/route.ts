@@ -15,6 +15,7 @@ import Attachment from "@/models/Attachment";
 import { verifyToken } from "@/lib/auth";
 import mongoose from "mongoose";
 import { unlink } from "fs";
+import storageClient from "@/client/supabaseClient";
 
 interface IndexRequest {
   attachmentId: string;
@@ -99,7 +100,11 @@ export async function POST(
             { status: 400 }
           );
         }
-        const pdfLoader = new PDFLoader(filePath);
+        const fileBlob = await storageClient
+          .from("mind-lens-test")
+          .download(filePath!);
+        const pdfLoader = new PDFLoader(fileBlob!.data!);
+
         docs = await pdfLoader.load();
         break;
 
@@ -209,14 +214,15 @@ export async function POST(
       },
     }));
 
-    if (filePath)
-      unlink(filePath, (err) => {
-        if (err) {
-          console.error("An error occurred deleting file:", err);
-        } else {
-          console.log("File deleted successfully");
-        }
-      });
+    // TODO handle unlink logic using supabase storage
+    // if (filePath)
+    //   unlink(filePath, (err) => {
+    //     if (err) {
+    //       console.error("An error occurred deleting file:", err);
+    //     } else {
+    //       console.log("File deleted successfully");
+    //     }
+    //   });
 
     // Use a collection name that includes user context for better isolation
     const collectionName = `mindlens-${decoded.userId}`;
